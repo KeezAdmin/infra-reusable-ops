@@ -47,19 +47,6 @@ jobs:
                       }
                     }
                   ]
-                  {
-                      "type": "context",
-                      "elements": [
-                        {
-                          "type": "image",
-                          "image_url": "https://slack-imgs.com/?c=1&o1=wi32.he32.si&url=https%3A%2F%2Fgithub.githubassets.com%2Ffavicon.ico",
-                          "alt_text": "Git Icon"
-                        },
-                        {
-                          "type": "mrkdwn",
-                          "text": "2kg-coretech/bannana-job #${{ github.run_number }} <!date^${{ env.TIMESTAMP }}^ {date_short_pretty} {time}| #ERROR>"
-                        }
-                      ]
                 }
               ]
             }
