@@ -1,0 +1,67 @@
+# .github/workflows/post-build-notify.yml
+name: notify
+on:
+  workflow_call:
+    inputs:
+      channel-id:
+        description: "The Slack channel ID to send the notification to"
+        required: true
+        type: string
+      job-status:
+        description: "The status of the job (success or failure)"
+        required: true
+        type: string
+      message:
+        description: "Additional message or details"
+        required: false
+        type: string
+    secrets:
+      SLACK_BOT_TOKEN:
+        description: "The Slack bot token for authentication"
+        required: true
+env:
+  SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
+  
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set Timestamp
+        run: |
+          echo "TIMESTAMP=$(date +%s)" >> ${GITHUB_ENV}
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          channel-id: ${{ inputs.channel-id }}
+          payload: |
+            {
+              "attachments": [
+                {
+                  "color": "${{ inputs.job-status == 'success' && '#36a64f' || '#ff0000' }}",
+                  "blocks": [
+                    {
+                      "type": "section",
+                      "text": {
+                        "type": "mrkdwn",
+                        "text": "${{ inputs.job-status == 'success' && 'Build succeeded!' || 'Build failed!' }}\nRepository: *2kg-coretech/bannana-job*\nBranch: `${{ github.ref_name }}`\n\n${{ inputs.message }}"
+                      }
+                    }
+                  ]
+                  {
+                      "type": "context",
+                      "elements": [
+                        {
+                          "type": "image",
+                          "image_url": "https://slack-imgs.com/?c=1&o1=wi32.he32.si&url=https%3A%2F%2Fgithub.githubassets.com%2Ffavicon.ico",
+                          "alt_text": "Git Icon"
+                        },
+                        {
+                          "type": "mrkdwn",
+                          "text": "2kg-coretech/bannana-job #${{ github.run_number }} <!date^${{ env.TIMESTAMP }}^ {date_short_pretty} {time}| #ERROR>"
+                        }
+                      ]
+                }
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
